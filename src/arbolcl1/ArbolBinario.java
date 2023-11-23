@@ -30,32 +30,50 @@ public class ArbolBinario {
     }
 
     public void reconstruirArbol(String preOrden, String inOrden) {
-        String[] preOrdenArray = preOrden.split(",");
-        String[] inOrdenArray = inOrden.split(",");
-
-        raiz = reconstruirArbolRec(preOrdenArray, inOrdenArray, 0, inOrdenArray.length - 1, 0);
+    if (preOrden == null || inOrden == null) {
+        System.out.println("Los recorridos preorden e inorden no pueden ser nulos.");
+        return;
     }
 
-    private Nodo reconstruirArbolRec(String[] preOrdenArray, String[] inOrdenArray, int inStart, int inEnd, int preIndex) {
-        if (inStart > inEnd) {
-            return null;
-        }
+    String[] preOrdenArray = preOrden.split(",");
+    String[] inOrdenArray = inOrden.split(",");
 
-        Nodo nodo = new Nodo(preOrdenArray[preIndex]);
+    if (preOrdenArray.length != inOrdenArray.length) {
+        System.out.println("Los recorridos preorden e inorden no tienen la misma longitud.");
+        return;
+    }
 
-        int inIndex = 0;
-        for (int i = inStart; i <= inEnd; i++) {
-            if (inOrdenArray[i].equals(preOrdenArray[preIndex])) {
-                inIndex = i;
-                break;
-            }
-        }
+    raiz = reconstruirArbolRec(preOrdenArray, inOrdenArray, 0, inOrdenArray.length - 1, new int[]{0});
+}
 
-        nodo.izquierdo = reconstruirArbolRec(preOrdenArray, inOrdenArray, inStart, inIndex - 1, preIndex + 1);
-        nodo.derecho = reconstruirArbolRec(preOrdenArray, inOrdenArray, inIndex + 1, inEnd, preIndex + inIndex - inStart + 1);
+private Nodo reconstruirArbolRec(String[] preOrdenArray, String[] inOrdenArray, int inStart, int inEnd, int[] preIndex) {
+    if (inStart > inEnd) {
+        return null;
+    }
 
+    Nodo nodo = new Nodo(preOrdenArray[preIndex[0]]);
+    preIndex[0]++;
+
+    if (inStart == inEnd) {
         return nodo;
     }
+
+    int inIndex = buscarIndiceInorden(inOrdenArray, inStart, inEnd, nodo.valor);
+
+    nodo.izquierdo = reconstruirArbolRec(preOrdenArray, inOrdenArray, inStart, inIndex - 1, preIndex);
+    nodo.derecho = reconstruirArbolRec(preOrdenArray, inOrdenArray, inIndex + 1, inEnd, preIndex);
+
+    return nodo;
+}
+
+private int buscarIndiceInorden(String[] inOrdenArray, int start, int end, String valor) {
+    for (int i = start; i <= end; i++) {
+        if (inOrdenArray[i].equals(valor)) {
+            return i;
+        }
+    }
+    return -1;
+}
 
     public void generarArchivoJSON(String nombreArchivo) {
         try (FileWriter file = new FileWriter("data/" + nombreArchivo)) {
@@ -81,32 +99,45 @@ public class ArbolBinario {
         return resultado;
     }
 
-   private void obtenerNodosEnFormatoJSONRec(Nodo nodo, List<String> resultado) {
+ private void obtenerNodosEnFormatoJSONRec(Nodo nodo, List<String> resultado) {
     if (nodo == null) {
-        resultado.add("null");
-        return;
-    }
+        resultado.add("{ \"valor\": null, \"izquierdo\": null, \"derecho\": null }");
+    } else {
+        StringBuilder nodoJSON = new StringBuilder();
+        nodoJSON.append("{ \"valor\": \"").append(nodo.valor).append("\", ");
 
-    StringBuilder nodoJSON = new StringBuilder();
-    nodoJSON.append("{ \"valor\": \"").append(nodo.valor).append("\", ");
+        // Verificar el nodo izquierdo
+        if (nodo.izquierdo != null) {
+            nodoJSON.append("\"izquierdo\": \"").append(nodo.izquierdo.valor).append("\", ");
+        } else {
+            nodoJSON.append("\"izquierdo\": null, ");
+        }
 
-    if (nodo.izquierdo != null) {
-        nodoJSON.append("\"izquierdo\": ");
+        // Verificar el nodo derecho
+        if (nodo.derecho != null) {
+            nodoJSON.append("\"derecho\": \"").append(nodo.derecho.valor).append("\"");
+        } else {
+            nodoJSON.append("\"derecho\": null");
+        }
+
+        nodoJSON.append("}");
+        resultado.add(nodoJSON.toString());
+
         obtenerNodosEnFormatoJSONRec(nodo.izquierdo, resultado);
-    } else {
-        nodoJSON.append("\"izquierdo\": null");
-    }
-
-    nodoJSON.append(", ");
-
-    if (nodo.derecho != null) {
-        nodoJSON.append("\"derecho\": ");
         obtenerNodosEnFormatoJSONRec(nodo.derecho, resultado);
-    } else {
-        nodoJSON.append("\"derecho\": null");
     }
+}
+   public void imprimirInorden() {
+    System.out.println("Recorrido Inorden del Árbol:");
+    imprimirInordenRec(raiz);
+    System.out.println();
+}
 
-    nodoJSON.append("}");
-    resultado.add(nodoJSON.toString());
+private void imprimirInordenRec(Nodo nodo) {
+    if (nodo != null) {
+        imprimirInordenRec(nodo.izquierdo);
+        System.out.print(nodo.valor + " ");
+        imprimirInordenRec(nodo.derecho);
+    }
 }
 }
