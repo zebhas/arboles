@@ -23,7 +23,7 @@ class Nodo {
 }
 
 public class ArbolBinario {
-    private Nodo raiz;
+    public Nodo raiz;
 
     public ArbolBinario() {
         raiz = null;
@@ -100,9 +100,7 @@ private int buscarIndiceInorden(String[] inOrdenArray, int start, int end, Strin
     }
 
  private void obtenerNodosEnFormatoJSONRec(Nodo nodo, List<String> resultado) {
-    if (nodo == null) {
-        resultado.add("{ \"valor\": null, \"izquierdo\": null, \"derecho\": null }");
-    } else {
+    if (nodo != null) {
         StringBuilder nodoJSON = new StringBuilder();
         nodoJSON.append("{ \"valor\": \"").append(nodo.valor).append("\", ");
 
@@ -126,6 +124,7 @@ private int buscarIndiceInorden(String[] inOrdenArray, int start, int end, Strin
         obtenerNodosEnFormatoJSONRec(nodo.izquierdo, resultado);
         obtenerNodosEnFormatoJSONRec(nodo.derecho, resultado);
     }
+
 }
    public void imprimirInorden() {
     System.out.println("Recorrido Inorden del Árbol:");
@@ -140,4 +139,5 @@ private void imprimirInordenRec(Nodo nodo) {
         imprimirInordenRec(nodo.derecho);
     }
 }
+
 }
