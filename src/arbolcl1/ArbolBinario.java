@@ -7,82 +7,106 @@ package arbolcl1;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 class Nodo {
+    String valor;
+    Nodo izquierdo;
+    Nodo derecho;
 
-    int valor;
-    Nodo izquierdo, derecho;
-
-    public Nodo(int item) {
-        valor = item;
-        izquierdo = derecho = null;
+    public Nodo(String valor) {
+        this.valor = valor;
+        this.izquierdo = null;
+        this.derecho = null;
     }
 }
 
 public class ArbolBinario {
-
     private Nodo raiz;
 
     public ArbolBinario() {
         raiz = null;
     }
 
-    public void reconstruir(String preOrden, String inOrden) {
-        raiz = reconstruirArbol(preOrden, inOrden, 0, preOrden.length() - 1, 0, inOrden.length() - 1);
+    public void reconstruirArbol(String preOrden, String inOrden) {
+        String[] preOrdenArray = preOrden.split(",");
+        String[] inOrdenArray = inOrden.split(",");
+
+        raiz = reconstruirArbolRec(preOrdenArray, inOrdenArray, 0, inOrdenArray.length - 1, 0);
     }
 
-    private Nodo reconstruirArbol(String preOrden, String inOrden, int preInicio, int preFin, int inInicio, int inFin) {
-        if (preInicio > preFin || inInicio > inFin) {
+    private Nodo reconstruirArbolRec(String[] preOrdenArray, String[] inOrdenArray, int inStart, int inEnd, int preIndex) {
+        if (inStart > inEnd) {
             return null;
         }
 
-        int valorRaiz = Integer.parseInt(preOrden.substring(preInicio, preInicio + 1));
-        Nodo nodo = new Nodo(valorRaiz);
+        Nodo nodo = new Nodo(preOrdenArray[preIndex]);
 
-        int posicionRaiz = 0;
-        for (int i = inInicio; i <= inFin; i++) {
-            if (Integer.parseInt(inOrden.substring(i, i + 1)) == valorRaiz) {
-                posicionRaiz = i;
+        int inIndex = 0;
+        for (int i = inStart; i <= inEnd; i++) {
+            if (inOrdenArray[i].equals(preOrdenArray[preIndex])) {
+                inIndex = i;
                 break;
             }
         }
 
-        nodo.izquierdo = reconstruirArbol(preOrden, inOrden, preInicio + 1, preInicio + posicionRaiz - inInicio, inInicio, posicionRaiz - 1);
-        nodo.derecho = reconstruirArbol(preOrden, inOrden, preInicio + posicionRaiz - inInicio + 1, preFin, posicionRaiz + 1, inFin);
+        nodo.izquierdo = reconstruirArbolRec(preOrdenArray, inOrdenArray, inStart, inIndex - 1, preIndex + 1);
+        nodo.derecho = reconstruirArbolRec(preOrdenArray, inOrdenArray, inIndex + 1, inEnd, preIndex + inIndex - inStart + 1);
 
         return nodo;
     }
 
-    private String convertirEnJSON(Nodo nodo) {
-        if (nodo == null) {
-            return "null";
-        }
+    public void generarArchivoJSON(String nombreArchivo) {
+        try (FileWriter file = new FileWriter("data/" + nombreArchivo)) {
+            List<String> nodosJSON = obtenerNodosEnFormatoJSON(raiz);
 
-        StringBuilder resultado = new StringBuilder();
-        resultado.append("{")
-                .append("\"valor\": ")
-                .append(nodo.valor)
-                .append(", \"izquierdo\": ")
-                .append(convertirEnJSON(nodo.izquierdo))
-                .append(", \"derecho\": ")
-                .append(convertirEnJSON(nodo.derecho))
-                .append("}");
-
-        return resultado.toString();
-    }
-
-    public String imprimirEnJSON() {
-        return convertirEnJSON(raiz);
-    }
-
-    public void crearArchivo(String info, String nombreArchivo) {
-        try {
-            FileWriter archivo = new FileWriter("data/" + nombreArchivo);
-            archivo.write(info);
-            archivo.close();
-            System.out.println("El archivo " + nombreArchivo + " ha sido creado correctamente.");
+            file.write("[\n");
+            for (int i = 0; i < nodosJSON.size(); i++) {
+                file.write(nodosJSON.get(i));
+                if (i < nodosJSON.size() - 1) {
+                    file.write(",\n");
+                }
+            }
+            file.write("\n]");
+            System.out.println("¡Archivo JSON generado con éxito!");
         } catch (IOException e) {
-            System.out.println("Hubo un error al crear el archivo: " + e.getMessage());
+            System.out.println("Error al generar el archivo JSON: " + e.getMessage());
         }
     }
+
+    private List<String> obtenerNodosEnFormatoJSON(Nodo nodo) {
+        List<String> resultado = new ArrayList<>();
+        obtenerNodosEnFormatoJSONRec(nodo, resultado);
+        return resultado;
+    }
+
+   private void obtenerNodosEnFormatoJSONRec(Nodo nodo, List<String> resultado) {
+    if (nodo == null) {
+        resultado.add("null");
+        return;
+    }
+
+    StringBuilder nodoJSON = new StringBuilder();
+    nodoJSON.append("{ \"valor\": \"").append(nodo.valor).append("\", ");
+
+    if (nodo.izquierdo != null) {
+        nodoJSON.append("\"izquierdo\": ");
+        obtenerNodosEnFormatoJSONRec(nodo.izquierdo, resultado);
+    } else {
+        nodoJSON.append("\"izquierdo\": null");
+    }
+
+    nodoJSON.append(", ");
+
+    if (nodo.derecho != null) {
+        nodoJSON.append("\"derecho\": ");
+        obtenerNodosEnFormatoJSONRec(nodo.derecho, resultado);
+    } else {
+        nodoJSON.append("\"derecho\": null");
+    }
+
+    nodoJSON.append("}");
+    resultado.add(nodoJSON.toString());
+}
 }
