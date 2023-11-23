@@ -3,8 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package arbolcl1;
-
 import java.util.Scanner;
 
 public class ArbolCLI {
@@ -22,11 +20,11 @@ public class ArbolCLI {
         boolean finish = false;
         while (!finish) {
             Screen.clear();
+
             System.out.println("------------------------------------------");
-            System.out.println("-                                        -");
             System.out.println("-           Siembra de árboles           -");
-            System.out.println("-                                        -");
             System.out.println("------------------------------------------");
+
             System.out.println("EL sistema para la plantación de árboles binarios\n");
 
             System.out.println("Menú principal:");
@@ -71,10 +69,10 @@ public class ArbolCLI {
                 String inOrden = archivoProperties.obtenerInOrden();
 
                 if (preOrden != null && inOrden != null) {
-                    arbolBinario.reconstruir(preOrden, inOrden);
-                    String arbolEnJSON = arbolBinario.imprimirEnJSON();
-                    arbolBinario.crearArchivo(arbolEnJSON, "arbolPlantado.json");
-                    System.out.println("Ha plantado el árbol con éxito!\nPara verlo, diríjase a /data/arbolPlantado.json");
+                    arbolBinario.reconstruirArbol(preOrden, inOrden);
+                    arbolBinario.generarArchivoJSON("arbolPlantado.json)");
+                    System.out.println("¡Árbol plantado con éxito!");
+                    System.out.println("Para verlo, diríjase a /data/arbolPlantado.json");
                     System.out.println("Nota: ejecute Refresh (Clic derecho - Refresh) sobre la carpeta /data/ para actualizar y visualizar el archivo JSON");
                     System.out.println("Presione 1 para salir");
                     in.next();
