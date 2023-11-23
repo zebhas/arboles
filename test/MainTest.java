@@ -1,9 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
+import arbolcl1.ArbolBinario;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -36,4 +31,10 @@ public class MainTest {
     public void testSample() {
         assertEquals(2, 2);
     }
+     public void pruebaDeteccionSubarbol() {
+        ArbolBinario arbolPrincipal = new ArbolBinario();
+        arbolPrincipal.reconstruirArbol("d,b,e,a,f,c,g", "a,b,d,e,c,f,g");
+
+     }
+}
 }
