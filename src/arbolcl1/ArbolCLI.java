@@ -70,6 +70,9 @@ public class ArbolCLI {
 
                 if (preOrden != null && inOrden != null) {
                     arbolBinario.reconstruirArbol(preOrden, inOrden);
+                    arbolBinario.imprimirInorden();
+                    arbolBinario.imprimirInorden();
+                    
                     arbolBinario.generarArchivoJSON("arbolPlantado.json)");
                     System.out.println("¡Árbol plantado con éxito!");
                     System.out.println("Para verlo, diríjase a /data/arbolPlantado.json");
